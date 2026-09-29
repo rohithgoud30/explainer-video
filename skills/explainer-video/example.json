@@ -1,0 +1,160 @@
+{
+  "voice": "af_heart",
+  "pronounce": {
+    "ASAP": "A-sap",
+    "console.typesafe.ai": "console dot typesafe dot AI",
+    "docs.typesafe.ai": "docs dot typesafe dot AI",
+    "TYPESAFE_API_KEY": "TypeSafe API key"
+  },
+  "slides": [
+    {
+      "label": "The problem",
+      "title": "Your code can't read",
+      "body": "<div class=chat><div class=them data-at=0>📩 My payouts have been failing for 3 days.</div></div><div class=flow><div data-at=3>Is it urgent?</div><div data-at=4>Which team gets it?</div></div><div class=flow><div class=good data-at=5>🧑 A person<small>knows in one second</small></div><div class=bad data-at=6>⚙️ Your code<small>sees a string of characters</small></div></div>",
+      "say": [
+        "Imagine your app gets this support message.",
+        "My payouts have been failing for three days.",
+        "Your code needs to decide two things.",
+        "Is this urgent?",
+        "And which team should get it?",
+        "A person knows the answer in one second.",
+        "But normal code can't read. It just sees a string of characters."
+      ]
+    },
+    {
+      "label": "Fix one",
+      "title": "Keyword rules break",
+      "code": "if \"urgent\" in message or \"asap\" in message:\n    priority = \"high\"",
+      "body": "<div class=flow><div data-at=2>📩 “My payouts have been failing for 3 days.”</div><div class=arrow data-at=2>→</div><div class=bad data-at=3>✗ Rule says: not urgent<small>neither word appears</small></div></div><pre data-at=4>elif \"failing\" in message and \"days\" in message: ...\nelif \"broken\" in message: ...\nelif \"not working\" in message: ...\n# still misses: \"haven't been paid since Monday\"</pre>",
+      "say": [
+        "The first thing people try is keyword rules.",
+        "If the message says urgent, or ASAP, mark it high priority.",
+        "But look at our message.",
+        "It doesn't say either word, so the rule gets it wrong.",
+        "People never write the way your rules expect.",
+        "So you keep adding rules, and they keep missing."
+      ]
+    },
+    {
+      "label": "Fix two",
+      "title": "A chatbot answers in essays",
+      "body": "<div class=chat><div class=me data-at=0>Is this urgent? Which team?</div><div class=them data-at=2>This seems fairly urgent, as payout issues can affect cash flow. It might be best handled by billing, though it could also be a technical problem…</div></div><p class=bad data-at=4>✗ Your code has to dig the answer out of a paragraph.</p><p class=bad data-at=5>✗ Ask again, and the wording changes.</p>",
+      "say": [
+        "The second thing people try is asking a chatbot.",
+        "It understands the message just fine.",
+        "But it answers like this.",
+        "A whole paragraph. Seems fairly urgent. Probably billing. Could also be technical.",
+        "Now your code has to dig the answer out of that text.",
+        "And next time, the wording can be different, and your code breaks again."
+      ]
+    },
+    {
+      "label": "What Jev is",
+      "title": "Understands like AI, answers like code",
+      "body": "<div class=flow><div class=bad data-at=0>Keyword rules<small>✓ clean answers<br>✗ can't understand</small></div><div class=bad data-at=0>Chatbot<small>✓ understands<br>✗ answers in essays</small></div><div class=good data-at=1>Jev, by TypeSafe<small>✓ understands<br>✓ clean answers</small></div></div><div class='meter good' style='--p:.91' data-at=4><span>team: <code>billing</code></span><div class=track><div class=fill></div></div><b>0.91</b></div><p class=muted data-at=4>One of your options, plus how sure it is.</p>",
+      "say": [
+        "This is the gap that Jev fills.",
+        "Jev is an AI model made by a company called TypeSafe.",
+        "It reads and understands language, like a chatbot does.",
+        "But it never writes you a paragraph.",
+        "It only answers with the options you gave it, plus a number that says how sure it is.",
+        "So you get the understanding of AI, with answers your code can use directly."
+      ]
+    },
+    {
+      "label": "What Jev is",
+      "title": "Why it's called System One",
+      "body": "<p class=muted data-at=1>The name comes from the book <i>Thinking, Fast and Slow</i>.</p><table><tr><th></th><th>System 1</th><th>System 2</th></tr><tr data-at=2><td class=muted>In people</td><td>Fast gut judgment</td><td>Slow, careful reasoning</td></tr><tr data-at=3><td class=muted>In AI</td><td class=good><b>Jev</b></td><td>Chat and reasoning models</td></tr></table><p class=big data-at=4>⚡ One small judgment, in about 100 ms</p><p data-at=6>Your code stays in charge. It asks Jev only when it needs common sense.</p>",
+      "say": [
+        "TypeSafe calls Jev a System One model.",
+        "The name comes from the book Thinking, Fast and Slow.",
+        "System one is your fast gut judgment. System two is slow, careful reasoning.",
+        "Jev is the fast kind.",
+        "It makes one small judgment, usually in about a tenth of a second.",
+        "It doesn't plan, and it doesn't take actions.",
+        "Your code stays in charge, and asks Jev only when it needs a bit of common sense."
+      ]
+    },
+    {
+      "label": "How it works",
+      "title": "You give it text and questions",
+      "body": "<div class=flow><div data-at=2>📄 State<small>“My payouts have been failing for 3 days.”</small></div><div data-at=3>❓ Questions<small>as many as you need, three kinds</small></div></div><table><tr><th>Kind</th><th>Question</th><th>Jev answers</th></tr><tr data-at=4><td><code>noul</code></td><td>Does this convey urgency?</td><td><b>0.95</b> <span class=muted>chance of yes</span></td></tr><tr data-at=5><td><code>choice</code></td><td>Billing, technical, or sales?</td><td><b>billing</b></td></tr><tr data-at=6><td><code>score</code></td><td>Calm → frustrated → very angry</td><td><b>1.4</b> <span class=muted>on your scale</span></td></tr></table>",
+      "say": [
+        "Here's how you use it.",
+        "You send Jev two things.",
+        "First, the state. That's the text you care about, here the customer's message.",
+        "Second, your questions. There are three kinds.",
+        "A noul is a yes or no question. You get back the chance of yes, like zero point nine five.",
+        "A choice picks one option from your list, like billing.",
+        "And a score places it on a scale you describe, like calm, frustrated, or very angry.",
+        "Jev answers all of them at the same time, in one request."
+      ]
+    },
+    {
+      "label": "How it works",
+      "title": "The number tells you when to trust it",
+      "body": "<div class='meter good' style='--p:.95' data-at=1><span>is_urgent</span><div class=track><div class=fill></div></div><b>0.95</b><span>Clear. Page the on-call team.</span></div><div class='meter good' style='--p:.08' data-at=2><span>is_urgent</span><div class=track><div class=fill></div></div><b>0.08</b><span>Clear. Normal queue.</span></div><div class='meter mid' style='--p:.55' data-at=3><span>is_urgent</span><div class=track><div class=fill></div></div><b>0.55</b><span>Unsure. Send it to a person.</span></div><p data-at=5>Jev is trained so these numbers match reality across many answers.</p><p class=muted data-at=6>You pick the cut-offs by testing on your own data.</p>",
+      "say": [
+        "That number is the most useful part.",
+        "If Jev says zero point nine five, it's clearly urgent, so your code can page someone.",
+        "If it says zero point zero eight, it's clearly not.",
+        "But if it says zero point five five, Jev is unsure.",
+        "So your code can send that one to a person instead of guessing.",
+        "Jev is trained so that, across many answers, these numbers match what really happens.",
+        "You choose the cut-offs by testing on your own messages."
+      ]
+    },
+    {
+      "label": "The key rule",
+      "title": "Ask small questions",
+      "body": "<div class=flow><div class=bad data-at=2>✗ Is this email spam?<small>one answer hides many judgments</small></div><div class=good data-at=3>✓ Three small questions<small>Does the sender match the company name?<br>Does it ask for a password?<br>Does it push you to act today?</small></div></div><p data-at=4>Each small answer is easier to get right.</p><p data-at=5>When a result looks wrong, you can see which part caused it.</p><p class=muted data-at=6>Your code puts the answers together.</p>",
+      "say": [
+        "Here's the most important rule for getting good results.",
+        "Ask small, specific questions.",
+        "Don't ask, is this email spam? That hides many judgments in one answer.",
+        "Instead ask: does the sender match the company name? Does it ask for a password? Does it push you to act today?",
+        "Each small answer is easier to get right.",
+        "And when something goes wrong, you can see exactly which part caused it.",
+        "Then your own code puts the answers together."
+      ]
+    },
+    {
+      "label": "Try it",
+      "title": "Get a key and send a request",
+      "body": "<div class=cols><ol><li data-at=1>Create a key at <b>console.typesafe.ai</b></li><li data-at=2>Save it:<br><code>export TYPESAFE_API_KEY=…</code></li><li data-at=3>Send the model, the state, and your questions</li></ol><div><pre data-at=3>POST /v1/systemone\n{\n  \"model\": \"jev-latest\",\n  \"state\": \"My payouts have been failing for 3 days.\",\n  \"questions\": {\n    \"is_urgent\": { \"type\": \"noul\",\n      \"instructions\": \"Does this convey urgency?\" }\n  }\n}</pre><pre data-at=4>{ \"answers\": { \"is_urgent\": { \"noul\": 0.95 } } }</pre></div></div>",
+      "say": [
+        "Ready to try it?",
+        "Go to console.typesafe.ai, and create an API key.",
+        "Save it in your terminal as TYPESAFE_API_KEY.",
+        "Then send one request with the model, the state, and your questions.",
+        "The answer comes back under the same name you gave the question.",
+        "That's the whole API. One request in, one set of answers out."
+      ]
+    },
+    {
+      "label": "Try it",
+      "title": "Use the answer in your app",
+      "body": "<pre data-at=1>const jev = new TypeSafeClient();   // npm install @typesafe-ai/sdk\nconst { answers } = await jev.systemOne({\n  state: { message },\n  questions: {\n    urgent: noul(\"Does this convey urgency?\"),\n    team: choice(\"Which team should handle this?\",\n      { billing: null, technical: null, sales: null }),\n  },\n});</pre><pre data-at=3>if (answers.urgent.noul &gt; 0.8) pageOnCall();\nrouteTo(answers.team.choice);</pre>",
+      "say": [
+        "In a real app, you'll use the SDK.",
+        "Ask your questions, and get typed answers back.",
+        "Then it's just normal code.",
+        "If urgency is above zero point eight, page someone, and route the ticket to the team Jev picked.",
+        "Jev did the reading. Your code made the decision."
+      ]
+    },
+    {
+      "label": "Recap",
+      "title": "Jev in one sentence",
+      "body": "<p class=big data-at=1>Jev turns language into answers your code can use: your options, plus how sure it is.</p><ul><li data-at=2>It doesn't write text, chat, or take actions</li><li data-at=3>It reads text only, and works best in English</li><li data-at=4>Ask small questions, and let your code combine them</li><li data-at=4>Use the number to decide when a person should check</li></ul><p class=muted data-at=5>Docs: docs.typesafe.ai</p>",
+      "say": [
+        "So, Jev in one sentence.",
+        "Jev turns language into answers your code can use: one of your options, plus how sure it is.",
+        "It doesn't write text, chat, or take actions.",
+        "It reads text only, and it works best in English.",
+        "Ask small questions, let your code combine them, and use the number to decide when a person should check.",
+        "That's Jev. The full docs are at docs.typesafe.ai."
+      ]
+    }
+  ]
+}

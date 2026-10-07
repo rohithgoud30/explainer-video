@@ -51,6 +51,7 @@ The viewer has to feel the problem before the answer means anything.
 }
 ```
 
+- `links`: optional related links for the slide's chapter, as URLs or `{"label": "...", "url": "..."}`. The renderer writes every chapter's start time, title, and links to `<video>.chapters.json` beside the MP4, so a player can show "related links" for the chapter you're watching.
 - `title`: each slide's title also names its **chapter**. The renderer stores one chapter per slide inside the MP4, so viewers can see the parts and jump between them in QuickTime, VLC, and other players. Make titles short and specific; they double as the video's table of contents.
 - `pronounce`: words the voice would misread, and what to say instead. Only the voice changes; captions still show the original word.
 - `say`: one sentence per entry. Each is spoken and captioned on its own. Put 4–8 on each slide and aim for 3–5 minutes in total.
@@ -98,6 +99,7 @@ When the video teaches from a web page, docs, an article, or an online book, sho
 - **Capture it** with `uv run <skill>/capture.py URL videos/<topic>/shots/<name>.png --dark`. With no option, the shot starts at the page's main title, skipping site headers, ads, and banners. Add `--section "Heading text"` to shoot the part under a heading, or `--selector "CSS"` for one element, such as a code block. `--dark` matches the slides; leave it off if the site has no dark theme.
 - **Put it on a slide** as `<figure class=shot data-at=1><img src="shots/<name>.png"><figcaption>Source: Site name, page title</figcaption></figure>`. The `src` path is relative to `script.json`; the renderer embeds the file. A shot fills at most 600px of height, so give it its own slide with little else on it, and keep that slide's title to one line: a two-line title pushes the shot into the caption.
 - **Where:** one shot of the page near the start ("This is today's lesson. Open it beside this video."), plus a section shot when the narration reaches a key part of it.
+- **Link every chapter to its source, by default.** Give each slide that teaches from the source a `links` entry to the exact section it covers, using the heading's anchor, so the viewer can open that part at the moment it's taught. Get the anchors from the page itself: `curl -sL URL | grep -oE '<h[234] id="[^"]+"'`, then use `URL#anchor`. Label each link with the section heading as written on the page. The intro and recap slides link to the whole page. Only link to pages and anchors that exist.
 - **Always credit the source** in the `figcaption`, with its license when it has one (MDN content is CC BY-SA 2.5).
 - **A book you can't open on the web:** use a photo or scan the user provides, the same way. Never recreate a page and present it as the real one.
 - Check the shot with your own eyes in the `check/` frames: no popups, ads, or cut-off text.

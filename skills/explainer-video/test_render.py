@@ -1,8 +1,9 @@
 """Run: uv run --with imageio-ffmpeg --with soundfile --with kokoro-onnx --with edge-tts --with playwright python test_render.py"""
+import json
 import pathlib
 import tempfile
 
-from render import chapters_metadata, inline_images, speakable
+from render import chapters_json, chapters_metadata, inline_images, speakable
 
 assert speakable("Learn HTML and CSS.", {}) == "Learn H-T-M-L and C-S-S."
 assert speakable("Two APIs and a URL", {}) == "Two A-P-I's and a U-R-L"
@@ -25,5 +26,11 @@ with tempfile.TemporaryDirectory() as d:
 meta = chapters_metadata(["Intro", "a = b; <b>c</b>"], [0.0, 3.5], 7.25)
 assert meta.startswith(";FFMETADATA1\n[CHAPTER]")
 assert "START=0\nEND=3500\ntitle=Intro" in meta and "START=3500\nEND=7250\ntitle=a \\= b\\; c" in meta, meta
+
+# The chapters file carries each slide's links; a bare URL becomes {label, url}.
+data = json.loads(chapters_json([{"title": "<b>Intro</b>", "links": ["https://a.dev"]},
+                                 {"title": "Two", "links": [{"label": "Docs", "url": "https://b.dev#x"}]}], [0.0, 2.5]))
+assert data == [{"start": 0.0, "title": "Intro", "links": [{"label": "https://a.dev", "url": "https://a.dev"}]},
+                {"start": 2.5, "title": "Two", "links": [{"label": "Docs", "url": "https://b.dev#x"}]}], data
 
 print("ok")

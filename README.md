@@ -37,7 +37,7 @@ uv run skills/explainer-video/capture.py https://example.com/docs/page videos/ex
 
 The first shot starts at the page's title. The second is cropped to the section under that heading. Both skip site headers, ads, and cookie popups.
 
-Every video has chapters: one per slide, named by the slide's title and stored in the MP4, so players can show the parts and jump between them.
+Every video has chapters: one per slide, named by the slide's title and stored in the MP4, so players can show the parts and jump between them. A slide's optional `links` (for example, the docs section it teaches) are written with its chapter to `<video>.chapters.json`, for players that show related links.
 
 Acronyms are read letter by letter automatically (HTML is said "H-T-M-L"), so scripts don't need to spell them out.
 

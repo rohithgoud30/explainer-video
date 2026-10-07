@@ -137,6 +137,16 @@ def chapters_metadata(titles, starts, end):
     return "\n".join(out) + "\n"
 
 
+def chapters_json(slides, starts):
+    """[{start, title, links: [{label, url}]}], one per slide. A slide's "links" may be URLs or {label, url}."""
+    def link(item):
+        return item if isinstance(item, dict) else {"label": item, "url": item}
+    chapters = [{"start": round(start, 3), "title": html.unescape(re.sub(r"<[^>]+>", "", s.get("title", ""))).strip(),
+                 "links": [link(item) for item in s.get("links", [])]}
+                for s, start in zip(slides, starts)]
+    return json.dumps(chapters, indent=2, ensure_ascii=False) + "\n"
+
+
 def speakable(line, pronounce):
     """What the voice says for a caption line: "pronounce" swaps first, then leftover acronyms are spelled out."""
     for word, say in pronounce.items():
@@ -233,6 +243,8 @@ def render(script_path, out_path):
     (work / "video.txt").write_text("".join(f"file '{p}'\nduration {d:.4f}\n" for p, d in frames) + f"file '{frames[-1][0]}'\n")
     ff("-f", "concat", "-safe", "0", "-i", str(work / "audio.txt"), str(work / "voice.wav"))
     (work / "chapters.txt").write_text(chapters_metadata([s.get("title", "") for s in slides], starts, elapsed))
+    # The same chapters with each slide's related links, beside the video, for players that show links (MP4 can't).
+    out_path.with_suffix(".chapters.json").write_text(chapters_json(slides, starts))
     ff("-f", "concat", "-safe", "0", "-i", str(work / "video.txt"), "-i", str(work / "voice.wav"),
        "-i", str(work / "chapters.txt"), "-map", "0:v", "-map", "1:a", "-map_metadata", "2", "-map_chapters", "2",
        "-vf", f"fps={FPS},format=yuv420p", "-c:v", "libx264", "-crf", "18",

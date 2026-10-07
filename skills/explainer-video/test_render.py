@@ -17,5 +17,8 @@ with tempfile.TemporaryDirectory() as d:
     out = inline_images('<img src="shots/a.png"> <img src=https://x.com/b.png> <img src="data:image/png;base64,AA">', pathlib.Path(d))
     assert 'src="data:image/png;base64,iVBORw==' in out, out
     assert "src=https://x.com/b.png" in out and 'src="data:image/png;base64,AA"' in out
+    # Code text on a slide that merely mentions src= is not an image.
+    code = '<pre>&lt;script src="script.js"&gt;&lt;/script&gt;</pre>'
+    assert inline_images(code, pathlib.Path(d)) == code
 
 print("ok")

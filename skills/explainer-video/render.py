@@ -109,10 +109,11 @@ def inline_images(body, base):
     """Slides load as page content with no file access, so local <img src> files are embedded as data URIs.
     Paths are relative to the script.json folder; web URLs and data URIs are left alone."""
     def embed(m):
-        path = base / m.group(2)
+        path = base / m.group(3)
         mime = mimetypes.guess_type(path.name)[0] or "image/png"
-        return f'src="data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"'
-    return re.sub(r"""src=(["']?)(?!data:|https?:)([^"'\s>]+)\1""", embed, body)
+        return f'{m.group(1)}"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"'
+    # Only real <img> tags: code samples on a slide can contain text like src="script.js".
+    return re.sub(r"""(<img\b[^>]*?\bsrc=)(["']?)(?!data:|https?:)([^"'\s>]+)\2""", embed, body)
 
 
 def slide_html(slide, progress, base):

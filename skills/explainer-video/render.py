@@ -124,6 +124,19 @@ def slide_html(slide, progress, base):
             f"<div class=cap><span></span></div><div class=bar style='width:{progress}%'></div>")
 
 
+def chapters_metadata(titles, starts, end):
+    """FFmpeg metadata with one chapter per slide, named by its title. Players (QuickTime, VLC, AVKit apps)
+    show these as chapters you can jump between."""
+    def clean(title):  # titles may hold HTML; escape what FFMETADATA treats as special
+        text = html.unescape(re.sub(r"<[^>]+>", "", title)).strip() or "Untitled"
+        return re.sub(r"([=;#\\\n])", r"\\\1", text)
+    out = [";FFMETADATA1"]
+    for i, (title, start) in enumerate(zip(titles, starts)):
+        stop = starts[i + 1] if i + 1 < len(starts) else end
+        out += ["[CHAPTER]", "TIMEBASE=1/1000", f"START={int(start * 1000)}", f"END={int(stop * 1000)}", f"title={clean(title)}"]
+    return "\n".join(out) + "\n"
+
+
 def speakable(line, pronounce):
     """What the voice says for a caption line: "pronounce" swaps first, then leftover acronyms are spelled out."""
     for word, say in pronounce.items():
@@ -178,6 +191,7 @@ def render(script_path, out_path):
         voice_ext = ".mp3"
 
     frames, wavs = [], []  # frames: (png name, seconds on screen)
+    starts, elapsed = [], 0.0  # when each slide begins, for the video's chapters
     with sync_playwright() as pw:
         try:
             browser = pw.chromium.launch(channel="chrome")  # installed Google Chrome
@@ -198,6 +212,9 @@ def render(script_path, out_path):
                "-ar", "48000", "-ac", "2", str(wav))
             wavs.append(f"file '{wav.name}'")
             total = duration(wav)
+            if j == 0:
+                starts.append(elapsed)
+            elapsed += total
 
             # step through the reveal animation frame by frame, then hold the settled frame
             animated = page.evaluate("document.getAnimations().length") > 0
@@ -215,7 +232,9 @@ def render(script_path, out_path):
     # concat demuxer needs the last image listed twice to honour its duration
     (work / "video.txt").write_text("".join(f"file '{p}'\nduration {d:.4f}\n" for p, d in frames) + f"file '{frames[-1][0]}'\n")
     ff("-f", "concat", "-safe", "0", "-i", str(work / "audio.txt"), str(work / "voice.wav"))
+    (work / "chapters.txt").write_text(chapters_metadata([s.get("title", "") for s in slides], starts, elapsed))
     ff("-f", "concat", "-safe", "0", "-i", str(work / "video.txt"), "-i", str(work / "voice.wav"),
+       "-i", str(work / "chapters.txt"), "-map", "0:v", "-map", "1:a", "-map_metadata", "2", "-map_chapters", "2",
        "-vf", f"fps={FPS},format=yuv420p", "-c:v", "libx264", "-crf", "18",
        "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out_path))
     # keep the settled last frame of each slide for checking, drop the rest

@@ -37,6 +37,8 @@ uv run skills/explainer-video/capture.py https://example.com/docs/page videos/ex
 
 The first shot starts at the page's title. The second is cropped to the section under that heading. Both skip site headers, ads, and cookie popups.
 
+Every video has chapters: one per slide, named by the slide's title and stored in the MP4, so players can show the parts and jump between them.
+
 Acronyms are read letter by letter automatically (HTML is said "H-T-M-L"), so scripts don't need to spell them out.
 
 The skill's wait-what pass is adapted from the `wait-what` skill in [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

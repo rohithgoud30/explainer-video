@@ -2,7 +2,7 @@
 import pathlib
 import tempfile
 
-from render import inline_images, speakable
+from render import chapters_metadata, inline_images, speakable
 
 assert speakable("Learn HTML and CSS.", {}) == "Learn H-T-M-L and C-S-S."
 assert speakable("Two APIs and a URL", {}) == "Two A-P-I's and a U-R-L"
@@ -20,5 +20,10 @@ with tempfile.TemporaryDirectory() as d:
     # Code text on a slide that merely mentions src= is not an image.
     code = '<pre>&lt;script src="script.js"&gt;&lt;/script&gt;</pre>'
     assert inline_images(code, pathlib.Path(d)) == code
+
+# One chapter per slide; HTML stripped and FFMETADATA specials escaped.
+meta = chapters_metadata(["Intro", "a = b; <b>c</b>"], [0.0, 3.5], 7.25)
+assert meta.startswith(";FFMETADATA1\n[CHAPTER]")
+assert "START=0\nEND=3500\ntitle=Intro" in meta and "START=3500\nEND=7250\ntitle=a \\= b\\; c" in meta, meta
 
 print("ok")

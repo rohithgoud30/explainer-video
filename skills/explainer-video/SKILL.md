@@ -66,6 +66,7 @@ The viewer has to feel the problem before the answer means anything.
 | `<div class='meter good' style='--p:.95'><span>name</span><div class=track><div class=fill></div></div><b>0.95</b><span>meaning</span></div>` | probabilities, scores, percentages (`good`, `bad`, or `mid` = yellow) |
 | `<div class=cols><div>left</div><div>right</div></div>` | steps on the left, code on the right |
 | `<table>` with `<tr data-at=N>` | kinds, options, one row per sentence |
+| `<figure class=shot><img src="shots/page.png"><figcaption>Source: …</figcaption></figure>` | a screenshot of the source page (see "Show the source") |
 | `<p class=big>`, `<p class=muted>`, `class=bad` / `class=good` on text | the key sentence, side notes, wrong / right |
 
 Colours carry meaning: coral = broken or wrong, mint = works, yellow = what is being said now. Use one emoji at most on a heading, and only as an icon.
@@ -88,6 +89,17 @@ The bar: a viewer who knows nothing about the topic follows every sentence the f
 - To check a spelling before rendering, print its phonemes: `uv run --with kokoro-onnx python -c "from kokoro_onnx.tokenizer import Tokenizer; print(Tokenizer().phonemize('H-T-M-L', 'en-us'))"`. A stress mark (ˈ) before each letter means each letter is clear.
 - Put camelCase and dotted code names in `pronounce` as plain words: "addEventListener": "add event listener", "console.log": "console dot log", "typeof": "type of", "const": "konst".
 - `voice` is a Kokoro voice. `af_heart` (default, warm female) is the most natural; others: `af_bella`, `am_michael`, `am_fenrir` (US), `bf_emma`, `bm_george` (UK). `speed` 0.75 (default) is a calm teaching pace; Kokoro's normal 1.0 feels rushed.
+
+## Show the source
+
+When the video teaches from a web page, docs, an article, or an online book, show the real page, so the viewer recognizes it when they open it.
+
+- **Capture it** with `uv run <skill>/capture.py URL videos/<topic>/shots/<name>.png --dark`. With no option, the shot starts at the page's main title, skipping site headers, ads, and banners. Add `--section "Heading text"` to shoot the part under a heading, or `--selector "CSS"` for one element, such as a code block. `--dark` matches the slides; leave it off if the site has no dark theme.
+- **Put it on a slide** as `<figure class=shot data-at=1><img src="shots/<name>.png"><figcaption>Source: Site name, page title</figcaption></figure>`. The `src` path is relative to `script.json`; the renderer embeds the file. A shot fills at most 600px of height, so give it its own slide with little else on it.
+- **Where:** one shot of the page near the start ("This is today's lesson. Open it beside this video."), plus a section shot when the narration reaches a key part of it.
+- **Always credit the source** in the `figcaption`, with its license when it has one (MDN content is CC BY-SA 2.5).
+- **A book you can't open on the web:** use a photo or scan the user provides, the same way. Never recreate a page and present it as the real one.
+- Check the shot with your own eyes in the `check/` frames: no popups, ads, or cut-off text.
 
 ## Series and course material
 

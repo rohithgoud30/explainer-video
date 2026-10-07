@@ -28,5 +28,16 @@ uv run skills/explainer-video/render.py skills/explainer-video/example.json vide
 
 The script format is documented in [`skills/explainer-video/SKILL.md`](skills/explainer-video/SKILL.md), and [`example.json`](skills/explainer-video/example.json) is a full example.
 
+To show a real source page in a video (docs, an article, an online book), screenshot it and put the image on a slide:
+
+```sh
+uv run skills/explainer-video/capture.py https://example.com/docs/page videos/example/shots/page.png --dark
+uv run skills/explainer-video/capture.py https://example.com/docs/page videos/example/shots/part.png --dark --section "Heading text"
+```
+
+The first shot starts at the page's title. The second is cropped to the section under that heading. Both skip site headers, ads, and cookie popups.
+
+Acronyms are read letter by letter automatically (HTML is said "H-T-M-L"), so scripts don't need to spell them out.
+
 The skill's wait-what pass is adapted from the `wait-what` skill in [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

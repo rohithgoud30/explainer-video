@@ -9,7 +9,9 @@ Voice: Kokoro 82M (open weights, Apache 2.0), run offline with kokoro-onnx.
 If Kokoro can't run, the whole video falls back to edge-tts (Microsoft's free online voice, Ava).
 """
 import asyncio
+import base64
 import html
+import mimetypes
 import os
 import json
 import pathlib
@@ -80,6 +82,9 @@ tr[data-at]:not(.shown)>td{border-color:transparent}  /* collapsed table borders
 .cap{position:fixed;left:0;right:0;bottom:46px;text-align:center}
 .cap span{display:inline-block;max-width:1640px;background:rgba(10,16,24,.88);color:#fff;font-size:38px;line-height:1.35;padding:14px 32px;border-radius:14px}
 .bar{position:fixed;left:0;bottom:0;height:8px;background:var(--hl)}
+.shot{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.shot img{display:block;max-width:100%;max-height:600px;border-radius:14px;border:2px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.shot figcaption{font-size:24px;color:var(--muted)}
 """
 
 STEP_JS = """([j, caption]) => {
@@ -100,11 +105,21 @@ def duration(path):
     return soundfile.info(str(path)).duration
 
 
-def slide_html(slide, progress):
+def inline_images(body, base):
+    """Slides load as page content with no file access, so local <img src> files are embedded as data URIs.
+    Paths are relative to the script.json folder; web URLs and data URIs are left alone."""
+    def embed(m):
+        path = base / m.group(2)
+        mime = mimetypes.guess_type(path.name)[0] or "image/png"
+        return f'src="data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"'
+    return re.sub(r"""src=(["']?)(?!data:|https?:)([^"'\s>]+)\1""", embed, body)
+
+
+def slide_html(slide, progress, base):
     code = f"<pre>{html.escape(slide['code'])}</pre>" if slide.get("code") else ""
     return (f"<!doctype html><meta charset=utf-8>{FONTS}<style>{CSS}</style>"
             f"<div class='slide enter'><div class=label>{slide.get('label', '')}</div><h1>{slide.get('title', '')}</h1>"
-            f"{code}{slide.get('body', '')}</div>"
+            f"{code}{inline_images(slide.get('body', ''), base)}</div>"
             f"<div class=cap><span></span></div><div class=bar style='width:{progress}%'></div>")
 
 
@@ -171,7 +186,8 @@ def render(script_path, out_path):
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
         for key, i, j, line, last in items:
             if j == 0:
-                page.set_content(slide_html(slides[i], 100 * (i + 1) / len(slides)), wait_until="networkidle")
+                page.set_content(slide_html(slides[i], 100 * (i + 1) / len(slides), pathlib.Path(script_path).parent),
+                                 wait_until="networkidle")
                 page.evaluate("document.fonts.ready")
             page.evaluate(STEP_JS, [j, line])
 

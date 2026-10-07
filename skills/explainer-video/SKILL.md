@@ -80,8 +80,23 @@ The bar: a viewer who knows nothing about the topic follows every sentence the f
 - Talk to one person: "you", contractions, a warm tone.
 - Say what the screen shows, in the same order.
 - Write `say` lines exactly as the caption should read: "ASAP", "docs.typesafe.ai", `TYPESAFE_API_KEY`. Never space out letters ("A S A P"); voices read them one by one.
-- Put every word a voice would misread into `pronounce`: acronyms said as words, respelled so the voice says them as people do ("ASAP": "A-sap"), web addresses, identifiers, and brand names. Write decimals as words in `say` ("zero point nine five").
+- Put every other word a voice would misread into `pronounce`: acronyms said as words, respelled so the voice says them as people do ("ASAP": "A-sap"), web addresses, identifiers, and brand names. Write decimals as words in `say` ("zero point nine five").
+- **Acronyms are handled for you.** The renderer spells any all-caps word of 2 to 6 letters letter by letter with hyphens: HTML becomes "H-T-M-L", APIs becomes "A-P-I's". Hyphens give every letter full stress, so the voice says it clearly instead of slurring it. Plain "HTML" comes out mushy, and respellings like "aitch-tee-em-el" weaken the last letter. So leave acronyms out of `pronounce` unless people say them as a word.
+- Acronyms said as a word are in `SAID_AS_WORDS` in `render.py` (JSON, DOM, ASAP, NASA, GIF, JPEG, TODO, CORS, CRUD, REST, YAML, WASM). For another one, add it to `pronounce` ("SQL": "sequel") or to that set.
+- Mixed-case names need `pronounce`, written with the same hyphen style: "Node.js": "node J-S".
+- Never write spaced letters ("H T M L") in `say` or `pronounce`; they leak into captions and sound choppy.
+- To check a spelling before rendering, print its phonemes: `uv run --with kokoro-onnx python -c "from kokoro_onnx.tokenizer import Tokenizer; print(Tokenizer().phonemize('H-T-M-L', 'en-us'))"`. A stress mark (ˈ) before each letter means each letter is clear.
+- Put camelCase and dotted code names in `pronounce` as plain words: "addEventListener": "add event listener", "console.log": "console dot log", "typeof": "type of", "const": "konst".
 - `voice` is a Kokoro voice. `af_heart` (default, warm female) is the most natural; others: `af_bella`, `am_michael`, `am_fenrir` (US), `bf_emma`, `bm_george` (UK). `speed` 0.75 (default) is a calm teaching pace; Kokoro's normal 1.0 feels rushed.
+
+## Series and course material
+
+When the video teaches from a course, plan, or set of lessons:
+
+- **Cover everything in the source.** List every heading and subheading of each source page, and make sure each one has a slide. Include the "other common errors" style sections and any interactive challenges. Skip only pure link lists ("See also"). Check the source page by page before rendering, and say plainly if anything is left out.
+- **One video per day or lesson, not one long video.** Each video opens with what today covers and ends with a checklist of what the viewer should now be able to do, plus what comes next.
+- **Don't spoil tests.** Show a skills test's tasks without the answers. Put the answers in a separate "answers explained" video to watch afterwards.
+- **Organize the folders:** `videos/<series>/<unit>/<day-N-topic>/<day-N-topic>.mp4`, with that video's `script.json` beside it, for example `videos/web-course/unit-1-basics/day-1-getting-started/`. Delete the `check/` frames after reviewing them.
 
 ## Example
 

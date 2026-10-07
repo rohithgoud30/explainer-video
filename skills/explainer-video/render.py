@@ -25,7 +25,10 @@ import soundfile
 from playwright.sync_api import sync_playwright
 
 FPS = 30
-KOKORO_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
+# Acronyms people say as a word, so they are not spelled out letter by letter. Add to "pronounce" for others.
+SAID_AS_WORDS = {"ASAP", "NASA", "JSON", "DOM", "GIF", "JPEG", "TODO", "SCSS", "CORS", "CRUD", "REST", "YAML", "WASM"}
+
+KOKORO_URL ="https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
 KOKORO_FILES = ("kokoro-v1.0.onnx", "voices-v1.0.bin")
 KOKORO_DIR = pathlib.Path(os.environ.get("KOKORO_DIR", pathlib.Path.home() / ".cache" / "explainer-video"))
 ANIM_FRAMES = 14  # frames captured for each reveal (~0.47s)
@@ -105,16 +108,26 @@ def slide_html(slide, progress):
             f"<div class=cap><span></span></div><div class=bar style='width:{progress}%'></div>")
 
 
+def speakable(line, pronounce):
+    """What the voice says for a caption line: "pronounce" swaps first, then leftover acronyms are spelled out."""
+    for word, say in pronounce.items():
+        line = re.sub(rf"(?<!\w){re.escape(word)}(?!\w)", say, line)
+    # Any acronym left is spelled letter by letter with hyphens: HTML -> "H-T-M-L", APIs -> "A-P-I's".
+    # Hyphens give every letter full stress so the voice says it clearly instead of slurring it;
+    # the apostrophe makes the plural "eyes", not "is". Acronyms said as words stay as they are.
+    def letters(m):
+        word, plural = m.group(1), m.group(2)
+        return m.group(0) if word in SAID_AS_WORDS else "-".join(word) + ("'s" if plural else "")
+    return re.sub(r"(?<![\w-])([A-Z]{2,6})(s?)(?![\w-])", letters, line)
+
+
 def render(script_path, out_path):
     script = json.loads(pathlib.Path(script_path).read_text())
     voice, speed = script.get("voice", "af_heart"), script.get("speed", 0.75)
     # "pronounce": {"ASAP": "A-sap"} changes only what the voice hears; captions keep the original
     pronounce = script.get("pronounce", {})
 
-    def spoken(line):
-        for word, say in pronounce.items():
-            line = re.sub(rf"(?<!\w){re.escape(word)}(?!\w)", say, line)
-        return line
+    spoken = lambda line: speakable(line, pronounce)
     slides = script["slides"]
     # one item per spoken sentence: (key, slide index, sentence index, sentence, last in slide)
     items = []
